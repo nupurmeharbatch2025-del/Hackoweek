@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nupur Mehar | Student Portfolio</title>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* ------------------ GLOBAL ------------------ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fce7f3, #e0f2fe, #ecfeff);
+            color: #333;
+        }
+
+        section {
+            padding: 70px 10%;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 2.3rem;
+            margin-bottom: 40px;
+        }
+
+        /* ------------------ HERO ------------------ */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* ===== PROFILE IMAGE STYLE (INCREASED SIZE) ===== */
+        .profile-pic {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 25px;
+            border: 6px solid white;
+            display: block;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.18);
+        }
+
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 600;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        /* ------------------ ABOUT ------------------ */
+        .about {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px;
+            padding: 50px;
+        }
+
+        .about p {
+            text-align: center;
+            max-width: 850px;
+            margin: auto;
+            line-height: 1.8;
+        }
+
+        /* ------------------ SKILLS ------------------ */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .skill-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+
+        .progress {
+            height: 8px;
+            background: #eee;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress span {
+            height: 100%;
+            display: block;
+            background: linear-gradient(90deg, #a78bfa, #60a5fa);
+        }
+
+        /* ------------------ PROJECTS ------------------ */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .project-card {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        /* ------------------ LIST SECTIONS ------------------ */
+        .list-section ul {
+            max-width: 700px;
+            margin: auto;
+            list-style: none;
+        }
+
+        .list-section li {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        /* ------------------ FOOTER ------------------ */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.6);
+        }
+
+        /* ------------------ MOBILE ------------------ */
+        @media (max-width: 768px) {
+            section {
+                padding: 50px 6%;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .profile-pic {
+                width: 180px;
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================== HERO SECTION ================== -->
+    <section class="hero">
+        <div class="hero-content">
+
+            <!-- ===== PROFILE IMAGE ===== -->
+            <!-- Place your photo as "profile.jpg" in the same folder -->
+            <img src="C:\Users\User\Pictures\PORTFOLIO..jpg"alt="Nupur Mehar" class="profile-pic">
+            <!-- ========================= -->
+
+            <h1>Nupur Mehar</h1>
+            <p>B.Tech Computer Science Engineering (1st Year)</p>
+            <p>📧 nupurmehar4@gmail.com | 📞 8767368889</p>
+        </div>
+    </section>
+
+    <!-- ================== ABOUT ================== -->
+    <section class="about">
+        <h2>About Me</h2>
+        <p>
+            I am a B.Tech Computer Science Engineering student at
+            <b>Symbiosis Institute of Technology, Nagpur (2025–2029)</b>.
+            I am passionate about programming, web development, and problem-solving.
+            I enjoy working on mini projects, practicing data structures,
+            and participating in hackathons to improve my skills.
+        </p>
+    </section>
+
+    <!-- ================== EDUCATION ================== -->
+    <section>
+        <h2>Education</h2>
+        <p style="text-align:center; line-height:1.8;">
+            <b>B.Tech – Computer Science Engineering</b><br>
+            Symbiosis Institute of Technology, Nagpur (2025–2029)<br><br>
+            <b>Junior College:</b> Shri Shivaji Science College, Congress Nagar<br>
+            <b>School:</b> Sri Guru Harkrishan Public School, Kabdi Square, Nagpur
+        </p>
+    </section>
+
+    <!-- ================== SKILLS ================== -->
+    <section>
+        <h2>Technical Skills</h2>
+        <div class="skills-grid">
+            <div class="skill-card">C / C++<div class="progress"><span style="width:80%"></span></div></div>
+            <div class="skill-card">Python<div class="progress"><span style="width:75%"></span></div></div>
+            <div class="skill-card">HTML<div class="progress"><span style="width:85%"></span></div></div>
+            <div class="skill-card">CSS<div class="progress"><span style="width:80%"></span></div></div>
+            <div class="skill-card">Data Structures<div class="progress"><span style="width:70%"></span></div></div>
+            <div class="skill-card">OOPS & DBMS<div class="progress"><span style="width:65%"></span></div></div>
+        </div>
+    </section>
+
+    <!-- ================== PROJECTS ================== -->
+    <section>
+        <h2>Projects & Mini Works</h2>
+        <div class="projects-grid">
+            <div class="project-card">
+                <h3>Student Record Management System</h3>
+                <p>Console-based system to manage student records.</p>
+                <p><b>Tech:</b> C / C++</p>
+            </div>
+            <div class="project-card">
+                <h3>Calculator Applications</h3>
+                <p>Calculator programs with user input handling.</p>
+                <p><b>Tech:</b> C, Python</p>
+            </div>
+            <div class="project-card">
+                <h3>Personal Portfolio Website</h3>
+                <p>Responsive personal portfolio.</p>
+                <p><b>Tech:</b> HTML, CSS</p>
+            </div>
+            <div class="project-card">
+                <h3>Data Structure Practice Programs</h3>
+                <p>Practice implementations of DS concepts.</p>
+                <p><b>Tech:</b> C / C++</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================== CERTIFICATIONS ================== -->
+    <section class="list-section">
+        <h2>Certifications</h2>
+        <ul>
+            <li>📜 C Programming Completion – Infosys</li>
+            <li>📜 Introduction to Python Programming</li>
+            <li>📜 HTML & CSS Fundamentals</li>
+            <li>📜 Introduction to Data Structures</li>
+            <li>📜 Git & GitHub Basics</li>
+        </ul>
+    </section>
+
+    <!-- ================== ACHIEVEMENTS ================== -->
+    <section class="list-section">
+        <h2>Achievements & Activities</h2>
+        <ul>
+            <li>🏆 Participant – IIIT Nagpur Hackathon</li>
+            <li>🚀 Active learner in programming and problem-solving</li>
+        </ul>
+    </section>
+
+    <!-- ================== INTERESTS ================== -->
+    <section>
+        <h2>Interests</h2>
+        <p style="text-align:center;">
+            Web Development • Problem Solving • Competitive Programming •
+            Artificial Intelligence • Cybersecurity • App Development
+        </p>
+    </section>
+
+    <!-- ================== FOOTER ================== -->
+    <footer>
+        © 2026 Nupur Mehar | Learning • Building • Growing
+    </footer>
+
+</body>
+</html>

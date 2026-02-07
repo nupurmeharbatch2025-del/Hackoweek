@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brûlé Bean Café</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap');
+    /* ===== COZY COFFEE AESTHETIC THEME ===== */
+    :root {
+      --bg-main: #f3ede7;
+      --bg-card: #fffaf4;
+      --text-main: #4b2e2a;
+      --text-muted: #7a5c4f;
+      --accent: #b08968;
+      --accent-dark: #7f5539;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Playfair Display', serif;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      background: var(--bg-card);
+      padding: 18px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+
+    .logo img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 2px solid var(--accent);
+    }
+
+    nav a {
+      margin-left: 22px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 500;
+      position: relative;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      left: 0;
+      bottom: -4px;
+      transition: 0.3s;
+    }
+
+    nav a:hover::after { width: 100%; }
+
+    /* ===== HERO ===== */
+    .hero {
+      max-width: 1100px;
+      margin: auto;
+      padding: 80px 40px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .hero h1 { font-size: 3rem; }
+    .hero p { color: var(--text-muted); }
+
+    .hero img {
+      width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px 26px;
+      border: none;
+      border-radius: 30px;
+      background: var(--accent-dark);
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover { background: var(--accent); }
+
+    section { max-width: 1100px; margin: auto; padding: 60px 40px; }
+    h2 { text-align: center; font-size: 2.2rem; }
+
+    .filter { text-align: center; margin-bottom: 30px; }
+    .filter button { margin: 5px; }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 30px;
+    }
+
+    .menu-card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      transition: 0.3s;
+    }
+
+    .menu-card:hover { transform: translateY(-6px); }
+
+    .menu-card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 8px 0;
+    }
+
+    .image-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding: 40px;
+      max-width: 1100px;
+      margin: auto;
+    }
+
+    .image-strip img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .cart {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--accent-dark);
+      color: white;
+      padding: 12px 18px;
+      border-radius: 30px;
+    }
+
+    @media (max-width: 800px) {
+      .hero { grid-template-columns: 1fr; }
+      .image-strip { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="logo">
+    <img src="C:\Users\User\Pictures\logo side.jpg" alt="Logo">
+    Brûlé Bean Café
+  </div>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#menu">Menu</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<section class="hero" id="home">
+  <div>
+    <h1>Slow Coffee, Cozy Vibes</h1>
+    <p>Your calm corner for handcrafted coffee & comfort food.</p>
+    <button onclick="document.getElementById('menu').scrollIntoView({behavior:'smooth'})">Explore Menu</button>
+  </div>
+  <img src="C:\Users\User\Pictures\cover photo.jpg" alt="Coffee">
+</section>
+
+<section id="menu">
+  <h2>Our Menu</h2>
+
+  <!-- COFFEE SECTION -->
+  <h3 style="margin-top:40px;">☕ Coffee</h3>
+  <div class="menu-grid">
+    <div class="menu-card"><img src="C:\Users\User\Pictures\cappichino.jpg"><h3>Classic Latte</h3><div class="menu-item"><span>₹200</span><button onclick="addCart()">Add</button></div></div>
+    <div class="menu-card"><img src="C:\Users\User\Pictures\cappuchino.jpg"><h3>Cappuccino</h3><div class="menu-item"><span>₹180</span><button onclick="addCart()">Add</button></div></div>
+    <div class="menu-card"><img src="C:\Users\User\Pictures\caramel.jpg"><h3>Caramel Macchiato</h3><div class="menu-item"><span>₹220</span><button onclick="addCart()">Add</button></div></div>
+    <div class="menu-card"><img src="C:\Users\User\Pictures\iced coffees.jpg"><h3>Iced Latte</h3><div class="menu-item"><span>₹210</span><button onclick="addCart()">Add</button></div></div>
+  </div>
+
+  <!-- BAKERY SECTION -->
+  <h3 style="margin-top:60px;">🥐 Bakery</h3>
+  <div class="menu-grid">
+    <div class="menu-card"><img src="C:\Users\User\Pictures\crossaint.jpg"><h3>Butter Croissant</h3><div class="menu-item"><span>₹130</span><button onclick="addCart()">Add</button></div></div>
+    <div class="menu-card"><img src="C:\Users\User\Pictures\cheesecake.jpg"><h3>Cheesecake Slice</h3><div class="menu-item"><span>₹190</span><button onclick="addCart()">Add</button></div></div>
+    <div class="menu-card"><img src="C:\Users\User\Pictures\brownie.jpg"><h3>Chocolate Brownie</h3><div class="menu-item"><span>₹150</span><button onclick="addCart()">Add</button></div></div>
+    <div class="menu-card"><img src="C:\Users\User\Pictures\oatmeal.jpg"><h3>Oatmeal Cookies</h3><div class="menu-item"><span>₹100</span><button onclick="addCart()">Add</button></div></div>
+  </div>
+
+  <!-- BITES SECTION -->
+  <h3 style="margin-top:60px;">🍽 Bites</h3>
+  <div class="menu-grid">
+    <div class="menu-card"><img src="C:\Users\User\Pictures\burger.jpg"><h3>Café Veg Burger</h3><div class="menu-item"><span>₹240</span><button onclick="addCart()">Add</button></div></div>
+    <div class="menu-card"><img src="C:\Users\User\Pictures\sandwich.jpg"><h3>Grilled Veg Sandwich</h3><div class="menu-item"><span>₹220</span><button onclick="addCart()">Add</button></div></div>
+    <div class="menu-card"><img src="C:\Users\User\Pictures\wrap.jpg"><h3>Veg Wrap</h3><div class="menu-item"><span>₹230</span><button onclick="addCart()">Add</button></div></div>
+    <div class="menu-card"><img src="C:\Users\User\Pictures\alfredo.jpg"><h3>Creamy Alfredo Pasta</h3><div class="menu-item"><span>₹280</span><button onclick="addCart()">Add</button></div></div>
+  </div>
+</section>
+
+<section style="text-align:center; padding-top:20px;">
+  <h2>Visit Us</h2>
+</section>
+
+<section class="image-strip">
+  <img src="C:\Users\User\Pictures\1st cafe.jpg"><img src="C:\Users\User\Pictures\2nd cafe.jpg"><img src="C:\Users\User\Pictures\3rd cafe.jpg">
+</section>
+
+<section id="about">
+  <h2>About Us</h2>
+  <p style="text-align:center; max-width:850px; margin:auto;">
+    Brûlé Bean Café was created with one simple idea — to offer a peaceful space where people can slow down and reconnect.
+    Located near the college campus, our café welcomes students, professionals, and coffee lovers alike.
+    <br><br>
+    We serve ethically sourced coffee, freshly baked pastries, and comforting meals made with care. Whether you're studying,
+    working remotely, or just taking a break, Brûlé Bean Café is designed to feel warm, calm, and familiar.
+  </p>
+</section>
+
+<section id="contact">
+  <h2>Contact & Visit Us</h2>
+  <p style="text-align:center; max-width:700px; margin:auto;">
+    📍 Near City College Campus, Main Street<br>
+    📞 +91 98765 43210<br>
+    ✉️ hello@brulebeancafe.com<br><br>
+    ⏰ Open Daily: 9:00 AM – 10:00 PM<br>
+    ☕ Free Wi‑Fi • Power Sockets • Study Friendly
+  </p>
+</section>
+
+<div class="cart">🛒 Cart: <span id="count">0</span></div>
+
+<script>
+  function filterMenu(type) {
+    document.querySelectorAll('.menu-card').forEach(card => {
+      if (card.classList.contains(type)) {
+        card.style.display = 'block';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  }
+
+  // default view
+  filterMenu('coffee');(type) {
+    document.querySelectorAll('.menu-card').forEach(card => {
+      card.style.display = card.classList.contains(type) ? 'block' : 'none';
+    });
+  }
+
+  let count = 0;
+  function addCart() {
+    count++;
+    document.getElementById('count').innerText = count;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fun Kids Quiz</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+font-family:Fredoka;
+background:linear-gradient(135deg,#ffd6e8,#c7f0ff);
+margin:0;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+
+.container{
+background:white;
+padding:30px;
+border-radius:20px;
+box-shadow:0 10px 25px rgba(0,0,0,0.15);
+width:420px;
+text-align:center;
+}
+
+h1{
+color:#ff6fa5;
+}
+
+input,select{
+width:90%;
+padding:10px;
+margin:8px 0;
+border-radius:10px;
+border:1px solid #ddd;
+font-family:Fredoka;
+}
+
+button{
+border:none;
+padding:12px;
+border-radius:12px;
+cursor:pointer;
+font-size:16px;
+background:#8ed0ff;
+color:white;
+margin-top:10px;
+}
+
+button:hover{
+transform:scale(1.05);
+}
+
+.answers{
+display:flex;
+flex-direction:column;
+gap:10px;
+margin-top:15px;
+}
+
+.answerBtn{
+background:#ffe07a;
+color:black;
+}
+
+.correct{
+background:#9be79b !important;
+}
+
+.wrong{
+background:#ff8f8f !important;
+}
+
+#progress{
+margin-bottom:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- Registration Page -->
+
+<div id="registration">
+
+<h1>🎉 Kids Quiz</h1>
+<p>Enter your details</p>
+
+<input type="text" id="name" placeholder="Student Name">
+
+<input type="text" id="roll" placeholder="Roll Number">
+
+<select id="section">
+<option value="">Select Section</option>
+<option>A</option>
+<option>B</option>
+<option>C</option>
+</select>
+
+<button onclick="startQuiz()">Start Quiz 🚀</button>
+
+</div>
+
+
+<!-- Quiz Page -->
+
+<div id="quizPage" style="display:none;">
+
+<h1>Fun Quiz</h1>
+
+<div id="progress"></div>
+
+<h3 id="question"></h3>
+
+<div id="answers" class="answers"></div>
+
+<button id="nextBtn">Next Question</button>
+
+</div>
+
+
+<!-- Result Page -->
+
+<div id="resultPage" style="display:none;">
+
+<h1>🎉 Quiz Result</h1>
+
+<p id="studentInfo"></p>
+
+<h2 id="scoreText"></h2>
+
+<button onclick="location.reload()">Play Again</button>
+
+</div>
+
+</div>
+
+<script>
+
+let studentName="";
+let rollNo="";
+let section="";
+
+function startQuiz(){
+
+studentName=document.getElementById("name").value;
+rollNo=document.getElementById("roll").value;
+section=document.getElementById("section").value;
+
+if(studentName=="" || rollNo=="" || section==""){
+alert("Please fill all details");
+return;
+}
+
+document.getElementById("registration").style.display="none";
+document.getElementById("quizPage").style.display="block";
+
+loadQuestion();
+
+}
+
+const quizData=[
+
+{
+question:"Which animal says Meow?",
+answers:["Dog","Cat","Cow","Lion"],
+correct:1
+},
+
+{
+question:"What color is the sun?",
+answers:["Blue","Yellow","Green","Purple"],
+correct:1
+},
+
+{
+question:"How many legs does a spider have?",
+answers:["6","8","10","4"],
+correct:1
+},
+
+{
+question:"Which fruit is red?",
+answers:["Banana","Apple","Orange","Mango"],
+correct:1
+},
+
+{
+question:"Which shape has 3 sides?",
+answers:["Circle","Triangle","Square","Rectangle"],
+correct:1
+}
+
+];
+
+let currentQuestion=0;
+let score=0;
+
+const questionEl=document.getElementById("question");
+const answersEl=document.getElementById("answers");
+const nextBtn=document.getElementById("nextBtn");
+const progressEl=document.getElementById("progress");
+
+function loadQuestion(){
+
+const q=quizData[currentQuestion];
+
+questionEl.innerText=q.question;
+
+progressEl.innerText=`Question ${currentQuestion+1} of ${quizData.length}`;
+
+answersEl.innerHTML="";
+
+q.answers.forEach((answer,index)=>{
+
+const btn=document.createElement("button");
+
+btn.innerText=answer;
+btn.classList.add("answerBtn");
+
+btn.onclick=()=>selectAnswer(btn,index);
+
+answersEl.appendChild(btn);
+
+});
+
+}
+
+function selectAnswer(button,index){
+
+const correct=quizData[currentQuestion].correct;
+
+const buttons=document.querySelectorAll(".answerBtn");
+
+buttons.forEach(b=>b.disabled=true);
+
+if(index===correct){
+
+button.classList.add("correct");
+score++;
+
+}else{
+
+button.classList.add("wrong");
+buttons[correct].classList.add("correct");
+
+}
+
+}
+
+nextBtn.onclick=()=>{
+
+currentQuestion++;
+
+if(currentQuestion<quizData.length){
+
+loadQuestion();
+
+}else{
+
+showResult();
+
+}
+
+};
+
+function showResult(){
+
+document.getElementById("quizPage").style.display="none";
+document.getElementById("resultPage").style.display="block";
+
+document.getElementById("studentInfo").innerHTML=
+`Name: ${studentName} <br>
+Roll No: ${rollNo} <br>
+Section: ${section}`;
+
+document.getElementById("scoreText").innerText=
+`Score: ${score} / ${quizData.length}`;
+
+}
+
+</script>
+
+</body>
+</html>

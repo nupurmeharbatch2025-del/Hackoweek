@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Arjun Mehta Photography</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<header>
+
+<h1>📷 Arjun Mehta Photography</h1>
+
+<p class="about">
+Landscape & Street Photographer • Capturing moments from around the world
+</p>
+
+</header>
+
+
+<div class="filters">
+
+<button onclick="filterImages('all')">All</button>
+<button onclick="filterImages('nature')">Nature</button>
+<button onclick="filterImages('city')">City</button>
+<button onclick="filterImages('people')">People</button>
+
+</div>
+
+
+<section class="gallery">
+
+<img class="normal"
+src="https://picsum.photos/id/1015/600/500"
+data-category="nature"
+data-title="Mountain Lake"
+data-location="Himachal"
+data-camera="Sony A7III">
+
+<img class="tall"
+src="https://picsum.photos/id/1016/500/800"
+data-category="nature"
+data-title="Forest Path"
+data-location="Uttarakhand"
+data-camera="Canon R6">
+
+<img class="wide"
+src="https://picsum.photos/id/1031/800/400"
+data-category="city"
+data-title="City Skyline"
+data-location="Mumbai"
+data-camera="Sony A7IV">
+
+<img class="normal"
+src="https://picsum.photos/id/1027/600/500"
+data-category="people"
+data-title="Street Portrait"
+data-location="Delhi"
+data-camera="Nikon Z6">
+
+<img class="tall"
+src="https://picsum.photos/id/1050/500/800"
+data-category="nature"
+data-title="Waterfall"
+data-location="Kerala"
+data-camera="Canon 5D">
+
+<img class="normal"
+src="https://picsum.photos/id/1043/600/500"
+data-category="city"
+data-title="Night Lights"
+data-location="Tokyo"
+data-camera="Sony A7III">
+
+<img class="wide"
+src="https://picsum.photos/id/1069/800/400"
+data-category="nature"
+data-title="Golden Field"
+data-location="Punjab"
+data-camera="Fujifilm XT4">
+
+<img class="normal"
+src="https://picsum.photos/id/1025/600/500"
+data-category="people"
+data-title="Child Smile"
+data-location="Nepal"
+data-camera="Sony A7III">
+
+<img class="tall"
+src="https://picsum.photos/id/1018/500/800"
+data-category="nature"
+data-title="Foggy Forest"
+data-location="Canada"
+data-camera="Canon R5">
+
+<img class="normal"
+src="https://picsum.photos/id/1005/600/500"
+data-category="people"
+data-title="Traveler"
+data-location="Ladakh"
+data-camera="Nikon D850">
+
+<img class="wide"
+src="https://picsum.photos/id/1035/800/400"
+data-category="city"
+data-title="Bridge Night"
+data-location="San Francisco"
+data-camera="Sony A7IV">
+
+<img class="normal"
+src="https://picsum.photos/id/1060/600/500"
+data-category="nature"
+data-title="Ocean Waves"
+data-location="Goa"
+data-camera="Canon R6">
+
+</section>
+
+
+<!-- LIGHTBOX -->
+
+<div class="lightbox" id="lightbox">
+
+<span class="close" onclick="closeLightbox()">✖</span>
+
+<img id="lightbox-img">
+
+<div class="details">
+
+<h2 id="photo-title"></h2>
+
+<p id="photo-location"></p>
+
+<p id="photo-camera"></p>
+
+</div>
+
+<div class="controls">
+
+<button onclick="prevImage()">⬅</button>
+
+<span id="counter"></span>
+
+<button onclick="nextImage()">➡</button>
+
+</div>
+
+<div class="actions">
+
+<button onclick="likeImage()">❤️ Like</button>
+
+<button onclick="downloadImage()">⬇ Download</button>
+
+</div>
+
+</div>
+
+<footer>
+
+<p>© 2026 Arjun Mehta Photography</p>
+
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>

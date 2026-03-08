@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GlowCart Cosmetic Store</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+<div class="logo">GlowCart</div>
+
+<input type="text" id="search" placeholder="Search cosmetics...">
+
+<div class="nav-icons">
+
+<button id="darkToggle">🌙</button>
+
+<div class="icon">
+❤️ <span id="wishlistCount">0</span>
+</div>
+
+<div class="icon" onclick="toggleCart()">
+🛒 <span id="cartCount">0</span>
+</div>
+
+</div>
+
+</header>
+
+
+<section class="hero">
+
+<h1>Natural Beauty Essentials</h1>
+
+<p>Discover skincare, makeup and beauty products</p>
+
+<button>Shop Now</button>
+
+</section>
+
+
+<section class="categories">
+
+<div class="category" onclick="filterCategory('Skincare')">Skincare</div>
+<div class="category" onclick="filterCategory('Makeup')">Makeup</div>
+<div class="category" onclick="filterCategory('Haircare')">Haircare</div>
+<div class="category" onclick="filterCategory('Fragrance')">Fragrance</div>
+<div class="category" onclick="filterCategory('Bath & Body')">Bath & Body</div>
+<div class="category" onclick="filterCategory('Beauty Tools')">Beauty Tools</div>
+
+</section>
+
+
+<section class="container">
+
+<div id="productGrid" class="products"></div>
+
+</section>
+
+
+<div id="cartSidebar" class="cart">
+
+<h2>Your Cart</h2>
+
+<div id="cartItems"></div>
+
+<p>Total: ₹<span id="totalPrice">0</span></p>
+
+</div>
+
+
+<div id="modal" class="modal">
+
+<div class="modal-content">
+
+<span onclick="closeModal()" class="close">&times;</span>
+
+<img id="modalImg">
+
+<h3 id="modalName"></h3>
+
+<p id="modalPrice"></p>
+
+<button id="modalCartBtn">Add to Cart</button>
+
+</div>
+
+</div>
+
+
+<div id="toast"></div>
+
+
+<footer class="footer">
+
+<div class="footer-container">
+
+<div class="footer-section">
+
+<h3>GlowCart Cosmetic Store</h3>
+
+<p>Your destination for premium beauty and skincare products.</p>
+
+</div>
+
+<div class="footer-section">
+
+<h4>Store Address</h4>
+
+<p>GlowCart Beauty Store</p>
+<p>MG Road</p>
+<p>Pune, Maharashtra</p>
+<p>India - 411001</p>
+
+</div>
+
+<div class="footer-section">
+
+<h4>Contact Us</h4>
+
+<p>📞 +91 9876543210</p>
+<p>📧 support@glowcart.com</p>
+<p>🕒 10AM - 9PM</p>
+
+</div>
+
+<div class="footer-section">
+
+<h4>Follow Us</h4>
+
+<p>Instagram</p>
+<p>Facebook</p>
+<p>Twitter</p>
+<p>YouTube</p>
+
+</div>
+
+</div>
+
+</footer>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

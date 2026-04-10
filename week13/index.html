@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stack-Based Browser History</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+  transition: 0.3s;
+}
+.light { background: #f5f5f5; color: #111; }
+
+.container { padding: 20px; }
+
+/* HEADER */
+.header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+}
+button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #6366f1;
+  color: white;
+  cursor: pointer;
+}
+button:hover { transform: scale(1.05); }
+
+/* PAGE VIEW */
+.viewer {
+  margin-top: 20px;
+  padding: 20px;
+  background: #1e293b;
+  border-radius: 12px;
+}
+.light .viewer { background: white; }
+
+/* STACKS */
+.stacks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.stack {
+  width: 45%;
+  min-height: 200px;
+  background: #334155;
+  border-radius: 12px;
+  padding: 10px;
+}
+.light .stack { background: #ddd; }
+
+.stack h3 {
+  text-align: center;
+}
+
+/* STACK ITEM */
+.item {
+  background: #1e293b;
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+.light .item { background: white; }
+
+.top {
+  border: 2px solid lime;
+}
+
+/* ANIMATION */
+.fade {
+  animation: fade 0.4s ease;
+}
+@keyframes fade {
+  from {opacity:0; transform: translateY(10px);}
+  to {opacity:1; transform: translateY(0);}
+}
+
+/* SEARCH */
+.search {
+  margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="header">
+  <button onclick="goBack()">⬅</button>
+  <button onclick="goForward()">➡</button>
+  <input id="url" placeholder="Enter URL or title...">
+  <button onclick="visit()">Visit</button>
+  <button onclick="toggleMode()">🌗</button>
+</div>
+
+<div class="search">
+  <input id="search" placeholder="Search history..." oninput="searchHistory()">
+</div>
+
+<div class="viewer" id="viewer">
+  <h2>Welcome</h2>
+  <p>Start browsing...</p>
+</div>
+
+<div class="stacks">
+  <div class="stack">
+    <h3>⬅ Back Stack</h3>
+    <div id="backStack"></div>
+  </div>
+
+  <div class="stack">
+    <h3>Forward Stack ➡</h3>
+    <div id="forwardStack"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+/* ===== STACK CLASS ===== */
+class Stack {
+  constructor(limit = 10) {
+    this.items = [];
+    this.limit = limit;
+  }
+
+  push(item) {
+    if (this.items.length >= this.limit) {
+      this.items.shift(); // remove oldest
+    }
+    this.items.push(item);
+  }
+
+  pop() {
+    return this.items.pop();
+  }
+
+  peek() {
+    return this.items[this.items.length - 1];
+  }
+
+  clear() {
+    this.items = [];
+  }
+
+  toArray() {
+    return [...this.items];
+  }
+}
+
+/* ===== NAVIGATION CONTROLLER ===== */
+const backStack = new Stack(10);
+const forwardStack = new Stack(10);
+let currentPage = null;
+
+function visit() {
+  const input = document.getElementById("url").value;
+  if (!input) return;
+
+  if (currentPage) {
+    backStack.push(currentPage);
+  }
+
+  forwardStack.clear();
+
+  currentPage = createPage(input);
+  save();
+  render();
+}
+
+function goBack() {
+  if (backStack.items.length === 0) return;
+
+  forwardStack.push(currentPage);
+  currentPage = backStack.pop();
+  save();
+  render();
+}
+
+function goForward() {
+  if (forwardStack.items.length === 0) return;
+
+  backStack.push(currentPage);
+  currentPage = forwardStack.pop();
+  save();
+  render();
+}
+
+/* ===== PAGE OBJECT ===== */
+function createPage(url) {
+  return {
+    url: url,
+    title: url,
+    time: new Date().toLocaleTimeString()
+  };
+}
+
+/* ===== RENDER ===== */
+function render() {
+  renderViewer();
+  renderStacks();
+}
+
+function renderViewer() {
+  const viewer = document.getElementById("viewer");
+  if (!currentPage) return;
+
+  viewer.innerHTML = `
+    <h2>${currentPage.title}</h2>
+    <p>${currentPage.url}</p>
+    <small>${currentPage.time}</small>
+  `;
+}
+
+function renderStacks() {
+  const backDiv = document.getElementById("backStack");
+  const forwardDiv = document.getElementById("forwardStack");
+
+  backDiv.innerHTML = "";
+  forwardDiv.innerHTML = "";
+
+  backStack.toArray().slice().reverse().forEach((item, i) => {
+    const el = document.createElement("div");
+    el.className = "item fade";
+    if (i === 0) el.classList.add("top");
+    el.innerHTML = `${item.title}<br><small>${item.time}</small>`;
+    backDiv.appendChild(el);
+  });
+
+  forwardStack.toArray().slice().reverse().forEach((item, i) => {
+    const el = document.createElement("div");
+    el.className = "item fade";
+    if (i === 0) el.classList.add("top");
+    el.innerHTML = `${item.title}<br><small>${item.time}</small>`;
+    forwardDiv.appendChild(el);
+  });
+}
+
+/* ===== SEARCH ===== */
+function searchHistory() {
+  const value = document.getElementById("search").value.toLowerCase();
+  document.querySelectorAll(".item").forEach(el => {
+    el.style.display = el.innerText.toLowerCase().includes(value) ? "block" : "none";
+  });
+}
+
+/* ===== KEYBOARD SHORTCUTS ===== */
+document.addEventListener("keydown", (e) => {
+  if (e.altKey && e.key === "ArrowLeft") goBack();
+  if (e.altKey && e.key === "ArrowRight") goForward();
+});
+
+/* ===== LOCAL STORAGE ===== */
+function save() {
+  localStorage.setItem("backStack", JSON.stringify(backStack.items));
+  localStorage.setItem("forwardStack", JSON.stringify(forwardStack.items));
+  localStorage.setItem("currentPage", JSON.stringify(currentPage));
+}
+
+function load() {
+  backStack.items = JSON.parse(localStorage.getItem("backStack")) || [];
+  forwardStack.items = JSON.parse(localStorage.getItem("forwardStack")) || [];
+  currentPage = JSON.parse(localStorage.getItem("currentPage"));
+  render();
+}
+
+/* ===== THEME ===== */
+function toggleMode() {
+  document.body.classList.toggle("light");
+}
+
+/* INIT */
+load();
+</script>
+</body>
+</html>

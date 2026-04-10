@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LibraShelf – Smart Library Catalogue</title>
+
+<link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+<h1>LibraShelf</h1>
+<p>Organize and explore books with ease.</p>
+</div>
+
+<div class="controls">
+
+<input type="text" id="searchBar" placeholder="Search by title">
+
+<select id="sortSelect">
+<option value="">Sort</option>
+<option value="title">Sort by Title</option>
+<option value="year">Sort by Year</option>
+</select>
+
+<select id="genreFilter">
+<option value="">All Genres</option>
+</select>
+
+</div>
+
+</header>
+
+
+<section class="management">
+
+<h2>Add New Book</h2>
+
+<div class="capacity">
+Capacity: <span id="capacityDisplay">0 / 10</span>
+</div>
+
+<div class="form">
+
+<input type="text" id="title" placeholder="Book Title">
+<input type="text" id="author" placeholder="Author">
+<input type="text" id="genre" placeholder="Genre">
+<input type="number" id="year" placeholder="Year">
+<input type="number" id="rating" placeholder="Rating (1-5)">
+<input type="text" id="image" placeholder="Book Image URL">
+
+<button onclick="addBook()">Add Book</button>
+
+</div>
+
+</section>
+
+
+<section class="stats">
+
+<h3>Library Stats</h3>
+
+<div class="stat-box">
+<p>Total Books</p>
+<h2 id="totalBooks">0</h2>
+</div>
+
+<div class="stat-box">
+<p>Most Common Genre</p>
+<h2 id="topGenre">-</h2>
+</div>
+
+</section>
+
+
+<section class="catalogue">
+
+<h2>Book Catalogue</h2>
+
+<div id="emptyState" class="empty">
+Your library is empty. Add your first book!
+</div>
+
+<div id="bookGrid" class="grid"></div>
+
+</section>
+
+
+<div id="toast" class="toast"></div>
+
+
+<footer>
+
+<p>LibraShelf • Smart Library Catalogue</p>
+
+</footer>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>

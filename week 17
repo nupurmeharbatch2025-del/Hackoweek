@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATM FLOW PRO | Circular Queue</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#f1f5f9;
+    --card:#ffffff;
+    --dark:#0f172a;
+    --accent:#3b82f6;
+    --green:#10b981;
+    --red:#f43f5e;
+    --yellow:#f59e0b;
+    --text:#0f172a;
+    --muted:#64748b;
+    --radius:14px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    font-family:'Plus Jakarta Sans';
+    background:var(--bg);
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:320px;
+    background:var(--dark);
+    color:white;
+    padding:2rem;
+    display:flex;
+    flex-direction:column;
+    gap:1.5rem;
+}
+
+.sidebar h1{font-size:1.4rem;}
+
+.btn{
+    width:100%;
+    padding:.9rem;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.add{background:var(--accent);color:white;}
+.serve{background:var(--green);color:white;}
+.reset{background:var(--red);color:white;}
+.toggle{background:#334155;color:white;}
+
+input[type=range]{width:100%;}
+
+.stat{
+    background:rgba(255,255,255,0.1);
+    padding:1rem;
+    border-radius:10px;
+    font-size:.85rem;
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    padding:2rem;
+}
+
+.queue{
+    display:flex;
+    flex-wrap:wrap;
+    gap:1rem;
+    margin-top:1rem;
+}
+
+.box{
+    width:100px;
+    height:100px;
+    background:var(--card);
+    border-radius:var(--radius);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-weight:700;
+    box-shadow:0 4px 12px rgba(0,0,0,0.05);
+    position:relative;
+}
+
+.front::after{
+    content:"F";
+    position:absolute;
+    top:5px;
+    left:5px;
+    color:var(--green);
+}
+
+.rear::after{
+    content:"R";
+    position:absolute;
+    bottom:5px;
+    right:5px;
+    color:var(--accent);
+}
+
+/* LOG */
+.log{
+    margin-top:2rem;
+    background:var(--card);
+    padding:1rem;
+    border-radius:var(--radius);
+    font-family:'JetBrains Mono';
+    font-size:.75rem;
+    max-height:200px;
+    overflow:auto;
+}
+
+/* ALERT */
+.alert{
+    margin-top:1rem;
+    padding:.8rem;
+    border-radius:10px;
+    display:none;
+}
+
+.alert.show{display:block;}
+
+.error{background:#fee2e2;color:#b91c1c;}
+.success{background:#dcfce7;color:#166534;}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h1>ATM FLOW PRO</h1>
+
+    <button class="btn add" onclick="addCustomer()">+ Add Customer</button>
+    <button class="btn serve" onclick="serveCustomer()">Serve</button>
+    <button class="btn reset" onclick="resetQueue()">Reset</button>
+
+    <button class="btn toggle" onclick="togglePeak()">Toggle Peak Mode</button>
+
+    <div>
+        <label>Simulation Speed</label>
+        <input type="range" min="1000" max="5000" step="500" id="speed" value="3000">
+    </div>
+
+    <div>
+        <label>Queue Capacity</label>
+        <input type="range" min="3" max="10" id="capacityRange" value="5" onchange="changeCapacity()">
+    </div>
+
+    <div class="stat">
+        <p>Front: <span id="front">-</span></p>
+        <p>Rear: <span id="rear">-</span></p>
+        <p>Size: <span id="size">0</span></p>
+        <p>Throughput: <span id="throughput">0</span></p>
+    </div>
+
+    <div class="alert error" id="errorBox"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+    <h2>Queue Visualization</h2>
+    <div class="queue" id="queue"></div>
+
+    <div class="log" id="log"></div>
+</div>
+
+<script>
+/* ===========================
+   CIRCULAR QUEUE CLASS
+=========================== */
+class CircularQueue{
+    constructor(size){
+        this.size = size;
+        this.queue = new Array(size);
+        this.front = -1;
+        this.rear = -1;
+    }
+
+    isFull(){
+        return (this.front === (this.rear + 1) % this.size);
+    }
+
+    isEmpty(){
+        return this.front === -1;
+    }
+
+    enqueue(val){
+        if(this.isFull()){
+            showError("Queue Full - Overflow");
+            return false;
+        }
+
+        if(this.isEmpty()){
+            this.front = 0;
+        }
+
+        this.rear = (this.rear + 1) % this.size;
+        this.queue[this.rear] = val;
+
+        return true;
+    }
+
+    dequeue(){
+        if(this.isEmpty()){
+            showError("Queue Empty - Underflow");
+            return null;
+        }
+
+        let val = this.queue[this.front];
+
+        if(this.front === this.rear){
+            this.front = this.rear = -1;
+        } else {
+            this.front = (this.front + 1) % this.size;
+        }
+
+        return val;
+    }
+
+    getSize(){
+        if(this.isEmpty()) return 0;
+        if(this.rear >= this.front){
+            return this.rear - this.front + 1;
+        }
+        return this.size - this.front + this.rear + 1;
+    }
+}
+
+/* ===========================
+   STATE
+=========================== */
+let cq = new CircularQueue(5);
+let id = 1;
+let servedCount = 0;
+let peakMode = false;
+let interval = null;
+
+/* ===========================
+   UI RENDER
+=========================== */
+function render(){
+    const container = document.getElementById("queue");
+    container.innerHTML = "";
+
+    cq.queue.forEach((c,i)=>{
+        let cls = "box";
+        if(i === cq.front) cls += " front";
+        if(i === cq.rear) cls += " rear";
+
+        container.innerHTML += `<div class="${cls}">${c || "-"}</div>`;
+    });
+
+    document.getElementById("front").textContent = cq.front;
+    document.getElementById("rear").textContent = cq.rear;
+    document.getElementById("size").textContent = cq.getSize();
+    document.getElementById("throughput").textContent = servedCount;
+}
+
+/* ===========================
+   ACTIONS
+=========================== */
+function addCustomer(){
+    const success = cq.enqueue("C"+id++);
+    if(success){
+        log("Customer Added");
+        hideError();
+    }
+    render();
+}
+
+function serveCustomer(){
+    const val = cq.dequeue();
+    if(val){
+        servedCount++;
+        log("Served " + val);
+        hideError();
+    }
+    render();
+}
+
+function resetQueue(){
+    cq = new CircularQueue(cq.size);
+    servedCount = 0;
+    id = 1;
+    log("System Reset");
+    render();
+}
+
+/* ===========================
+   LOGGING
+=========================== */
+function log(msg){
+    const logBox = document.getElementById("log");
+    logBox.innerHTML = `>> ${msg}<br>` + logBox.innerHTML;
+}
+
+/* ===========================
+   ERROR HANDLING
+=========================== */
+function showError(msg){
+    const box = document.getElementById("errorBox");
+    box.textContent = msg;
+    box.classList.add("show");
+}
+
+function hideError(){
+    document.getElementById("errorBox").classList.remove("show");
+}
+
+/* ===========================
+   CAPACITY CONTROL
+=========================== */
+function changeCapacity(){
+    const val = parseInt(document.getElementById("capacityRange").value);
+    cq = new CircularQueue(val);
+    log("Capacity changed to " + val);
+    render();
+}
+
+/* ===========================
+   PEAK MODE SIMULATION
+=========================== */
+function togglePeak(){
+    peakMode = !peakMode;
+
+    if(peakMode){
+        runSimulation();
+        log("Peak Mode ON");
+    } else {
+        clearInterval(interval);
+        log("Peak Mode OFF");
+    }
+}
+
+function runSimulation(){
+    const speed = document.getElementById("speed").value;
+
+    clearInterval(interval);
+    interval = setInterval(()=>{
+        const r = Math.random();
+
+        if(r < 0.65){
+            addCustomer();
+        } else {
+            serveCustomer();
+        }
+    }, speed);
+}
+
+/* ===========================
+   INIT
+=========================== */
+render();
+</script>
+
+</body>
+</html>

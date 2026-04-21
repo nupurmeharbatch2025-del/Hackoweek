@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TASKFLOW | Task Manager</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --dark: #0f172a;
+    --accent: #10b981;
+    --accent2: #8b5cf6;
+    --danger: #f43f5e;
+    --text: #0f172a;
+    --muted: #64748b;
+    --radius: 16px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background:var(--bg);
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:300px;
+    background:var(--dark);
+    color:white;
+    padding:2rem;
+    display:flex;
+    flex-direction:column;
+    gap:2rem;
+}
+
+.logo{
+    font-weight:700;
+    font-size:1.4rem;
+}
+
+.stats{
+    display:flex;
+    gap:1rem;
+}
+
+.stat{
+    flex:1;
+    background:rgba(255,255,255,0.1);
+    padding:1rem;
+    border-radius:10px;
+    text-align:center;
+}
+
+.stat h2{color:var(--accent);}
+.stat p{font-size:.7rem;opacity:.7;}
+
+.actions button{
+    width:100%;
+    padding:.9rem;
+    margin-bottom:.5rem;
+    border:none;
+    border-radius:10px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.add{background:var(--accent);color:white;}
+.undo{background:#334155;color:white;}
+.redo{background:#475569;color:white;}
+
+/* MAIN */
+.main{
+    flex:1;
+    padding:2rem;
+}
+
+.task-container{
+    max-width:700px;
+    margin:auto;
+}
+
+.task{
+    background:var(--card);
+    padding:1rem;
+    border-radius:var(--radius);
+    margin-bottom:.75rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    box-shadow:0 4px 10px rgba(0,0,0,0.05);
+}
+
+.task.completed{
+    opacity:.6;
+    text-decoration:line-through;
+}
+
+.task-actions button{
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    margin-left:.5rem;
+}
+
+/* MODAL */
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+
+.modal.active{display:flex;}
+
+.modal-box{
+    background:white;
+    padding:2rem;
+    border-radius:20px;
+    width:90%;
+    max-width:400px;
+}
+
+input{
+    width:100%;
+    padding:.8rem;
+    margin-bottom:1rem;
+    border:1px solid #ddd;
+    border-radius:10px;
+}
+
+.save{
+    width:100%;
+    padding:.8rem;
+    background:var(--accent);
+    color:white;
+    border:none;
+    border-radius:10px;
+}
+
+/* HISTORY */
+.history{
+    margin-top:2rem;
+    font-family:'JetBrains Mono';
+    font-size:.75rem;
+    color:var(--muted);
+}
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+    <div class="logo">TASKFLOW</div>
+
+    <div class="stats">
+        <div class="stat">
+            <h2 id="total">0</h2>
+            <p>Total</p>
+        </div>
+        <div class="stat">
+            <h2 id="done">0</h2>
+            <p>Done</p>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button class="add" onclick="openModal()">+ Add Task</button>
+        <button class="undo" onclick="undo()">Undo</button>
+        <button class="redo" onclick="redo()">Redo</button>
+    </div>
+</div>
+
+<div class="main">
+    <div class="task-container" id="tasks"></div>
+
+    <div class="history" id="history"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+    <div class="modal-box">
+        <h3>Add Task</h3>
+        <input id="taskInput" placeholder="Enter task">
+        <button class="save" onclick="saveTask()">Save</button>
+    </div>
+</div>
+
+<script>
+let tasks = [];
+let undoStack = [];
+let redoStack = [];
+
+function render(){
+    const container = document.getElementById("tasks");
+    container.innerHTML = "";
+
+    tasks.forEach((t,i)=>{
+        container.innerHTML += `
+        <div class="task ${t.done?'completed':''}">
+            <span>${t.text}</span>
+            <div class="task-actions">
+                <button onclick="toggle(${i})">✔</button>
+                <button onclick="removeTask(${i})">🗑</button>
+            </div>
+        </div>`;
+    });
+
+    document.getElementById("total").textContent = tasks.length;
+    document.getElementById("done").textContent = tasks.filter(t=>t.done).length;
+}
+
+function openModal(){
+    document.getElementById("modal").classList.add("active");
+}
+
+function saveTask(){
+    const val = document.getElementById("taskInput").value.trim();
+    if(!val) return;
+
+    const action = {type:"add", task:{text:val,done:false}};
+    apply(action);
+    undoStack.push(action);
+    redoStack = [];
+
+    closeModal();
+}
+
+function closeModal(){
+    document.getElementById("modal").classList.remove("active");
+    document.getElementById("taskInput").value="";
+}
+
+function toggle(i){
+    const action = {type:"toggle", index:i};
+    apply(action);
+    undoStack.push(action);
+    redoStack = [];
+}
+
+function removeTask(i){
+    const action = {type:"delete", index:i, task:tasks[i]};
+    apply(action);
+    undoStack.push(action);
+    redoStack = [];
+}
+
+function apply(action){
+    if(action.type==="add"){
+        tasks.push(action.task);
+    }
+    if(action.type==="toggle"){
+        tasks[action.index].done = !tasks[action.index].done;
+    }
+    if(action.type==="delete"){
+        tasks.splice(action.index,1);
+    }
+    render();
+    log(action);
+}
+
+function undo(){
+    if(!undoStack.length) return;
+    const action = undoStack.pop();
+    const reverse = reverseAction(action);
+    apply(reverse);
+    redoStack.push(action);
+}
+
+function redo(){
+    if(!redoStack.length) return;
+    const action = redoStack.pop();
+    apply(action);
+    undoStack.push(action);
+}
+
+function reverseAction(action){
+    if(action.type==="add"){
+        return {type:"delete", index:tasks.length-1};
+    }
+    if(action.type==="delete"){
+        return {type:"add", task:action.task};
+    }
+    if(action.type==="toggle"){
+        return {type:"toggle", index:action.index};
+    }
+}
+
+function log(action){
+    const history = document.getElementById("history");
+    history.innerHTML = `Last Action → ${action.type}`;
+}
+
+render();
+</script>
+
+</body>
+</html>

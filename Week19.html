@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAVEFORM | Doubly Linked Playlist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #09090b;
+            --surface: #18181b;
+            --surface-hover: #27272a;
+            --accent-1: #c026d3; /* Fuchsia */
+            --accent-2: #7e22ce; /* Purple */
+            --text-main: #f4f4f5;
+            --text-muted: #a1a1aa;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Ambient Background Glow */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%; left: -10%;
+            width: 50%; height: 50%;
+            background: radial-gradient(circle, rgba(192, 38, 211, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(100px);
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -20%; right: -10%;
+            width: 50%; height: 50%;
+            background: radial-gradient(circle, rgba(126, 34, 206, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            filter: blur(100px);
+        }
+
+        h1, h2, h3 { font-family: 'Space Grotesk', sans-serif; }
+
+        .glass-panel {
+            background: rgba(24, 24, 27, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border-radius: 1rem;
+        }
+
+        input {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+        input:focus {
+            border-color: var(--accent-1);
+            outline: none;
+            box-shadow: 0 0 10px rgba(192, 38, 211, 0.2);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(192, 38, 211, 0.5);
+        }
+        .btn-gradient:active { transform: translateY(0); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn-outline:hover {
+            border-color: white;
+            background: rgba(255,255,255,0.05);
+        }
+
+        /* Doubly Linked List Visualizer Styles */
+        .track-node {
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        
+        @keyframes slideIn {
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .track-card {
+            background: var(--surface);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            min-width: 200px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        /* The arrows representing NEXT and PREV pointers */
+        .pointer-arrows {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 1rem;
+            color: var(--accent-1);
+            font-weight: bold;
+            font-family: 'Space Grotesk', monospace;
+            letter-spacing: -2px;
+        }
+
+        .null-pointer {
+            color: #ef4444; /* Red for NULL */
+            font-family: monospace;
+            font-size: 0.8rem;
+            margin: 0 1rem;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+    </style>
+</head>
+<body class="p-4 md:p-8 flex flex-col gap-8 h-screen">
+
+    <header class="flex items-center gap-4 border-b border-zinc-800 pb-6">
+        <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-fuchsia-600 to-purple-600 flex items-center justify-center shadow-[0_0_15px_rgba(192,38,211,0.5)]">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+        </div>
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight">WAVEFORM</h1>
+            <p class="text-sm text-zinc-400">Doubly Linked List Audio Engine</p>
+        </div>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-8 flex-1 min-h-0">
+        
+        <div class="lg:col-span-4 glass-panel p-6 flex flex-col gap-8 h-fit">
+            
+            <section>
+                <h2 class="text-xl mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-fuchsia-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Add Track
+                </h2>
+                <div class="flex flex-col gap-3">
+                    <input type="text" id="songInput" placeholder="Enter track name..." class="w-full px-4 py-3 rounded-lg">
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="handleAdd('front')" class="btn-gradient py-2 rounded-lg text-sm">Add to Front</button>
+                        <button onclick="handleAdd('end')" class="btn-gradient py-2 rounded-lg text-sm">Add to End</button>
+                    </div>
+                </div>
+            </section>
+
+            <hr class="border-zinc-800">
+
+            <section>
+                <h2 class="text-xl mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Remove Track
+                </h2>
+                <div class="flex gap-3">
+                    <input type="number" id="posInput" placeholder="Position (1, 2, 3...)" min="1" class="w-full px-4 py-3 rounded-lg">
+                    <button onclick="handleDelete()" class="btn-outline px-6 py-2 rounded-lg whitespace-nowrap hover:bg-red-500/10 hover:text-red-400 hover:border-red-400">Delete</button>
+                </div>
+            </section>
+
+            <hr class="border-zinc-800">
+
+            <section>
+                <button onclick="handleReverse()" class="w-full py-4 rounded-lg flex items-center justify-center gap-2 text-white font-bold bg-zinc-800 hover:bg-zinc-700 transition-colors border border-zinc-700">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    REVERSE LIST (Shuffle)
+                </button>
+            </section>
+
+            <div id="statusMsg" class="mt-auto text-sm text-center text-zinc-400 h-5 transition-opacity duration-300"></div>
+        </div>
+
+        <div class="lg:col-span-8 glass-panel p-6 flex flex-col min-h-[500px]">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl">Active Queue</h2>
+                <span class="text-sm bg-zinc-800 px-3 py-1 rounded-full border border-zinc-700" id="countBadge">0 Tracks</span>
+            </div>
+            
+            <div id="playlistVisualizer" class="flex-1 overflow-x-auto overflow-y-hidden flex items-center py-8 custom-scrollbar">
+                </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- 1. DATA STRUCTURE: DOUBLY LINKED LIST NODE ---
+        class Node {
+            constructor(song) {
+                this.song = song;
+                this.prev = null;
+                this.next = null;
+            }
+        }
+
+        // --- 2. DOUBLY LINKED LIST CLASS ---
+        class DoublyLinkedList {
+            constructor() {
+                this.head = null;
+                this.tail = null;
+                this.size = 0;
+            }
+
+            // A: Add to Front
+            addFront(song) {
+                const newNode = new Node(song);
+                if (!this.head) {
+                    this.head = newNode;
+                    this.tail = newNode;
+                } else {
+                    newNode.next = this.head;
+                    this.head.prev = newNode;
+                    this.head = newNode;
+                }
+                this.size++;
+            }
+
+            // B: Add to End
+            addEnd(song) {
+                const newNode = new Node(song);
+                if (!this.tail) {
+                    this.head = newNode;
+                    this.tail = newNode;
+                } else {
+                    newNode.prev = this.tail;
+                    this.tail.next = newNode;
+                    this.tail = newNode;
+                }
+                this.size++;
+            }
+
+            // C: Delete by Position (1-indexed for user friendliness)
+            deleteAt(position) {
+                if (position < 1 || position > this.size || !this.head) {
+                    return false; // Invalid position
+                }
+
+                let current = this.head;
+
+                // Case 1: Deleting the Head
+                if (position === 1) {
+                    this.head = current.next;
+                    if (this.head) {
+                        this.head.prev = null; // Sever reverse link
+                    } else {
+                        this.tail = null; // List became empty
+                    }
+                } 
+                // Case 2: Deleting the Tail
+                else if (position === this.size) {
+                    current = this.tail;
+                    this.tail = current.prev;
+                    this.tail.next = null; // Sever forward link
+                } 
+                // Case 3: Deleting from the Middle
+                else {
+                    for (let i = 1; i < position; i++) {
+                        current = current.next;
+                    }
+                    // Rewire pointers around the node to be deleted
+                    current.prev.next = current.next;
+                    current.next.prev = current.prev;
+                }
+
+                this.size--;
+                return true;
+            }
+
+            // D: Reverse the List
+            reverse() {
+                if (this.size <= 1) return;
+
+                let current = this.head;
+                let temp = null;
+
+                // Swap 'next' and 'prev' for all nodes
+                while (current !== null) {
+                    temp = current.prev;
+                    current.prev = current.next;
+                    current.next = temp;
+                    current = current.prev; // Move to the "next" node (which is now stored in prev)
+                }
+
+                // Swap head and tail
+                if (temp !== null) {
+                    this.tail = this.head;
+                    this.head = temp.prev;
+                }
+            }
+
+            // Helper to get an array for UI rendering
+            toArray() {
+                let result = [];
+                let current = this.head;
+                while (current) {
+                    result.push(current.song);
+                    current = current.next;
+                }
+                return result;
+            }
+        }
+
+        // --- 3. APP STATE & INITIALIZATION ---
+        const playlist = new DoublyLinkedList();
+        
+        // Add some default tracks so it's not empty on load
+        playlist.addEnd("Midnight City");
+        playlist.addEnd("Resonance");
+        playlist.addEnd("Blinding Lights");
+
+        // --- 4. DOM INTERACTION & RENDER LOGIC ---
+        
+        function renderPlaylist() {
+            const container = document.getElementById('playlistVisualizer');
+            const arr = playlist.toArray();
+            document.getElementById('countBadge').innerText = `${playlist.size} Tracks`;
+            
+            container.innerHTML = ''; // Clear current view
+
+            if (arr.length === 0) {
+                container.innerHTML = `<div class="w-full text-center text-zinc-500 italic">Playlist is empty. Add a track to begin.</div>`;
+                return;
+            }
+
+            // Add starting NULL pointer
+            container.innerHTML += `<div class="null-pointer">NULL</div>`;
+
+            arr.forEach((song, index) => {
+                // Add Connection Arrows (if not the first item)
+                if (index > 0) {
+                    container.innerHTML += `
+                        <div class="pointer-arrows">
+                            <div>&#8594;</div>
+                            <div>&#8592;</div>
+                        </div>
+                    `;
+                }
+
+                // Render the Node
+                container.innerHTML += `
+                    <div class="track-node">
+                        <div class="track-card">
+                            <div class="text-xs text-fuchsia-400 font-bold mb-1">Pos: ${index + 1}</div>
+                            <div class="font-bold text-lg whitespace-nowrap">${song}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Add ending NULL pointer
+            container.innerHTML += `<div class="pointer-arrows"><div>&#8594;</div><div>&#8592;</div></div><div class="null-pointer">NULL</div>`;
+        }
+
+        function showStatus(msg, isError = false) {
+            const statusBox = document.getElementById('statusMsg');
+            statusBox.innerText = msg;
+            statusBox.style.color = isError ? '#ef4444' : '#a1a1aa';
+            statusBox.style.opacity = '1';
+            setTimeout(() => statusBox.style.opacity = '0', 3000);
+        }
+
+        // Handlers
+        function handleAdd(location) {
+            const input = document.getElementById('songInput');
+            const songName = input.value.trim();
+
+            if (!songName) {
+                showStatus("Please enter a track name.", true);
+                return;
+            }
+
+            if (location === 'front') {
+                playlist.addFront(songName);
+                showStatus(`Added "${songName}" to the front.`);
+            } else {
+                playlist.addEnd(songName);
+                showStatus(`Added "${songName}" to the end.`);
+            }
+
+            input.value = '';
+            renderPlaylist();
+        }
+
+        function handleDelete() {
+            const posInput = document.getElementById('posInput');
+            const pos = parseInt(posInput.value, 10);
+
+            if (isNaN(pos) || pos < 1 || pos > playlist.size) {
+                showStatus(`Invalid position. Please enter 1 to ${playlist.size}.`, true);
+                return;
+            }
+
+            playlist.deleteAt(pos);
+            posInput.value = '';
+            showStatus(`Deleted track at position ${pos}.`);
+            renderPlaylist();
+        }
+
+        function handleReverse() {
+            if (playlist.size <= 1) {
+                showStatus("Not enough tracks to shuffle/reverse.", true);
+                return;
+            }
+            
+            playlist.reverse();
+            showStatus("Playlist reversed successfully.");
+            renderPlaylist();
+        }
+
+        // Allow 'Enter' key to add to end
+        document.getElementById('songInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') handleAdd('end');
+        });
+
+        // Initial Render
+        renderPlaylist();
+
+    </script>
+</body>
+</html>

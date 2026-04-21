@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACADEMETRICS | Exam Score Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --surface: #ffffff;
+            --brand: #3b82f6; /* Blue-500 */
+            --brand-dark: #2563eb; /* Blue-600 */
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .dashboard-card {
+            background-color: var(--surface);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            transition: box-shadow 0.3s ease;
+        }
+        .dashboard-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--brand);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        /* Frequency Chart Styles */
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 200px;
+            padding-top: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .chart-bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            flex: 1;
+            min-width: 24px;
+            height: 100%;
+            group;
+        }
+
+        .chart-bar {
+            width: 100%;
+            background-color: var(--brand);
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .chart-bar:hover {
+            background-color: var(--brand-dark);
+        }
+
+        .chart-bar-tooltip {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .chart-bar:hover .chart-bar-tooltip {
+            opacity: 1;
+        }
+
+        .chart-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Custom Input Styling */
+        input[type="number"] {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
+        .btn-primary {
+            background-color: var(--brand);
+            color: white;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover { background-color: var(--brand-dark); }
+
+    </style>
+</head>
+<body class="p-4 md:p-8 min-h-screen flex flex-col">
+
+    <header class="mb-8 flex items-center gap-3">
+        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-200">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+        </div>
+        <div>
+            <h1 class="text-2xl font-bold tracking-tight text-slate-900">Academetrics</h1>
+            <p class="text-sm text-slate-500 font-medium">Exam Score Frequency Tracker</p>
+        </div>
+    </header>
+
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1">
+        
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            
+            <div class="dashboard-card border-t-4 border-t-blue-500">
+                <h2 class="text-lg font-bold mb-4">Log New Score</h2>
+                <div class="flex gap-2">
+                    <input type="number" id="scoreInput" min="0" max="100" placeholder="0 - 100" class="flex-1 bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all">
+                    <button onclick="submitScore()" class="btn-primary px-6 rounded-lg shadow-sm">Add</button>
+                </div>
+                <p id="errorMsg" class="text-red-500 text-sm mt-2 hidden">Please enter a valid score between 0 and 100.</p>
+            </div>
+
+            <div class="dashboard-card flex-1 flex flex-col min-h-[250px]">
+                <h2 class="text-lg font-bold mb-4 flex justify-between items-center">
+                    Raw Entries
+                    <span id="totalCount" class="bg-blue-100 text-blue-700 text-xs py-1 px-2 rounded-full font-bold">Total: 0</span>
+                </h2>
+                <div id="historyLog" class="flex-1 overflow-y-auto space-y-2 pr-2 text-sm font-mono text-slate-600">
+                    <div class="italic text-slate-400">No scores logged yet.</div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="lg:col-span-8 flex flex-col gap-6">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="dashboard-card text-center">
+                    <div class="stat-value" id="minDisplay">--</div>
+                    <div class="stat-label">Minimum Score</div>
+                </div>
+                <div class="dashboard-card text-center">
+                    <div class="stat-value" id="maxDisplay">--</div>
+                    <div class="stat-label">Maximum Score</div>
+                </div>
+                <div class="dashboard-card text-center relative overflow-hidden">
+                    <svg class="absolute -right-4 -bottom-4 w-24 h-24 text-blue-50 opacity-50" fill="currentColor" viewBox="0 0 24 24"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"></path></svg>
+                    <div class="stat-value relative z-10" id="modeDisplay">--</div>
+                    <div class="stat-label relative z-10" id="modeSubtext">Mode (Most Frequent)</div>
+                </div>
+            </div>
+
+            <div class="dashboard-card flex-1 flex flex-col">
+                <h2 class="text-lg font-bold mb-2">Score Frequency Distribution</h2>
+                <p class="text-xs text-slate-500 mb-4 font-mono">// Generated via array traversal</p>
+                
+                <div id="chartArea" class="chart-container">
+                    <div class="w-full text-center text-slate-400 italic mb-10">Add scores to generate frequency chart.</div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // --- 1. DATA STRUCTURES ---
+        // As requested: "array-based frequency count of scores" (Indices 0 through 100)
+        const scoreFrequencies = new Array(101).fill(0);
+        const rawHistory = []; // Keeps track of chronological entry order for the log
+
+        // --- 2. CORE LOGIC ---
+        
+        function submitScore() {
+            const inputEl = document.getElementById('scoreInput');
+            const errorMsg = document.getElementById('errorMsg');
+            const score = parseInt(inputEl.value, 10);
+
+            // Validation
+            if (isNaN(score) || score < 0 || score > 100) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            errorMsg.classList.add('hidden');
+
+            // Update Arrays
+            scoreFrequencies[score]++;
+            rawHistory.unshift(score); // Add to beginning of history log
+
+            // Clear input and run traversal updates
+            inputEl.value = '';
+            inputEl.focus();
+            
+            calculateAndUpdateStats();
+            updateHistoryUI();
+            updateChartUI();
+        }
+
+        // As requested: "find min/max/mode using linear traversal"
+        function calculateAndUpdateStats() {
+            let min = null;
+            let max = null;
+            let maxFreq = 0;
+            let modes = [];
+
+            // ONE linear traversal of the 101-length frequency array
+            // Time Complexity: O(N) where N is strictly 101
+            for (let i = 0; i <= 100; i++) {
+                let freq = scoreFrequencies[i];
+                
+                if (freq > 0) {
+                    // Min will be set on the very first non-zero frequency encountered
+                    if (min === null) min = i;
+                    
+                    // Max will constantly update, ending on the last non-zero frequency
+                    max = i;
+                    
+                    // Mode Calculation
+                    if (freq > maxFreq) {
+                        maxFreq = freq;
+                        modes = [i]; // New highest frequency, reset modes array
+                    } else if (freq === maxFreq) {
+                        modes.push(i); // Tie for highest frequency
+                    }
+                }
+            }
+
+            // Update DOM Elements
+            document.getElementById('minDisplay').innerText = min !== null ? min : '--';
+            document.getElementById('maxDisplay').innerText = max !== null ? max : '--';
+            
+            const modeDisplay = document.getElementById('modeDisplay');
+            const modeSubtext = document.getElementById('modeSubtext');
+            
+            if (modes.length === 0) {
+                modeDisplay.innerText = '--';
+                modeSubtext.innerText = 'Mode (Most Frequent)';
+            } else {
+                // If there are too many ties, just say "Multiple" to save UI space
+                if (modes.length > 3) {
+                    modeDisplay.innerText = 'Mult.';
+                    modeSubtext.innerText = `Modes: ${modes.slice(0,3).join(',')}... (${maxFreq}x each)`;
+                } else {
+                    modeDisplay.innerText = modes.join(', ');
+                    modeSubtext.innerText = modes.length === 1 ? `Mode (Appears ${maxFreq}x)` : `Modes (Appear ${maxFreq}x each)`;
+                }
+            }
+            
+            document.getElementById('totalCount').innerText = `Total: ${rawHistory.length}`;
+        }
+
+        // --- 3. UI RENDERING LOGIC ---
+
+        function updateHistoryUI() {
+            const historyLog = document.getElementById('historyLog');
+            historyLog.innerHTML = ''; // Clear
+            
+            rawHistory.forEach((score, index) => {
+                historyLog.innerHTML += `
+                    <div class="flex justify-between items-center py-1 border-b border-slate-100 last:border-0">
+                        <span class="text-slate-400">Entry #${rawHistory.length - index}</span>
+                        <span class="font-bold text-blue-600">${score}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function updateChartUI() {
+            const chartArea = document.getElementById('chartArea');
+            chartArea.innerHTML = ''; // Clear
+
+            // Find max frequency to calculate relative heights for the bar chart
+            let absoluteMaxFreq = Math.max(...scoreFrequencies);
+            
+            if (absoluteMaxFreq === 0) return;
+
+            // Iterate through the frequency array and create a bar for any score that has > 0 frequency
+            for (let i = 0; i <= 100; i++) {
+                if (scoreFrequencies[i] > 0) {
+                    let freq = scoreFrequencies[i];
+                    // Calculate height percentage (min 10% so it's visible)
+                    let heightPct = Math.max((freq / absoluteMaxFreq) * 100, 10);
+
+                    chartArea.innerHTML += `
+                        <div class="chart-bar-wrapper">
+                            <div class="chart-bar" style="height: ${heightPct}%">
+                                <span class="chart-bar-tooltip">Count: ${freq}</span>
+                            </div>
+                            <div class="chart-label">${i}</div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Allow pressing "Enter" to submit
+        document.getElementById('scoreInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') submitScore();
+        });
+
+    </script>
+</body>
+</html>

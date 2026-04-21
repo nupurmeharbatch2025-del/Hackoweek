@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TERMINAL | Binary Tree File System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --term-bg: #050505;
+            --term-green: #00ff41;
+            --term-dark-green: #008f11;
+            --term-border: #323232;
+        }
+
+        body {
+            background-color: var(--term-bg);
+            color: var(--term-green);
+            font-family: 'Fira Code', monospace;
+            overflow-x: hidden;
+            selection-background-color: var(--term-green);
+            selection-color: black;
+        }
+
+        /* CRT Screen Scanline Effect */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .terminal-box {
+            border: 1px solid var(--term-dark-green);
+            background: rgba(0, 20, 0, 0.3);
+            box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);
+        }
+
+        input, select {
+            background: transparent;
+            border: 1px solid var(--term-dark-green);
+            color: var(--term-green);
+            padding: 0.5rem;
+            outline: none;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--term-green);
+            box-shadow: 0 0 5px rgba(0, 255, 65, 0.5);
+        }
+
+        button.btn-term {
+            background: transparent;
+            border: 1px solid var(--term-green);
+            color: var(--term-green);
+            padding: 0.5rem 1rem;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+            z-index: 10;
+        }
+
+        button.btn-term:hover {
+            background: var(--term-green);
+            color: black;
+        }
+
+        /* Tree Visualization CSS */
+        .tree-ul {
+            list-style-type: none;
+            padding-left: 1.5rem;
+            border-left: 1px dashed var(--term-dark-green);
+            margin-left: 0.5rem;
+        }
+        .tree-li {
+            position: relative;
+            margin: 0.5rem 0;
+        }
+        .tree-li::before {
+            content: "----";
+            position: absolute;
+            left: -1.5rem;
+            top: 0.5em;
+            color: var(--term-dark-green);
+        }
+        .node-tag {
+            font-size: 0.7rem;
+            background: var(--term-dark-green);
+            color: black;
+            padding: 0 4px;
+            margin-right: 6px;
+            border-radius: 2px;
+        }
+
+        /* Toast */
+        #toast {
+            transition: opacity 0.3s, transform 0.3s;
+        }
+    </style>
+</head>
+<body class="p-6 md:p-12 min-h-screen flex flex-col gap-8">
+
+    <header class="border-b border-green-900 pb-4">
+        <h1 class="text-3xl font-bold tracking-widest uppercase text-shadow-glow">SysAdmin::DirTree</h1>
+        <p class="text-sm opacity-70 mt-2">// Binary Tree File System Implementation</p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
+        
+        <div class="terminal-box p-6 lg:col-span-1 h-fit">
+            <h2 class="text-xl mb-6 border-b border-green-900 pb-2">> mkdir</h2>
+            
+            <div class="flex flex-col gap-4">
+                <div>
+                    <label class="block text-sm mb-1">Parent Directory Name:</label>
+                    <input type="text" id="parentName" placeholder="e.g., root" class="w-full">
+                </div>
+                
+                <div>
+                    <label class="block text-sm mb-1">New Subdirectory Name:</label>
+                    <input type="text" id="childName" placeholder="e.g., bin" class="w-full">
+                </div>
+
+                <div>
+                    <label class="block text-sm mb-1">Branch (Binary):</label>
+                    <select id="position" class="w-full">
+                        <option value="left">Left Child</option>
+                        <option value="right">Right Child</option>
+                    </select>
+                </div>
+
+                <button class="btn-term mt-4 w-full" onclick="handleAddNode()">Execute Insert</button>
+            </div>
+        </div>
+
+        <div class="terminal-box p-6 lg:col-span-2 flex flex-col">
+            <h2 class="text-xl mb-6 border-b border-green-900 pb-2">> tree ./current</h2>
+            <div id="treeDisplay" class="flex-1 overflow-x-auto text-lg leading-relaxed">
+                </div>
+        </div>
+
+    </div>
+
+    <div class="terminal-box p-6 relative z-10">
+        <h2 class="text-xl mb-6 border-b border-green-900 pb-2">> ls --traverse</h2>
+        
+        <div class="flex flex-wrap gap-4 mb-6">
+            <button class="btn-term" onclick="runTraversal('pre')">Pre-Order [Root, L, R]</button>
+            <button class="btn-term" onclick="runTraversal('in')">In-Order [L, Root, R]</button>
+            <button class="btn-term" onclick="runTraversal('post')">Post-Order [L, R, Root]</button>
+        </div>
+
+        <div class="bg-black border border-green-900 p-4 min-h-[100px] font-mono whitespace-pre-wrap" id="traversalOutput">Waiting for execution...</div>
+    </div>
+
+    <div id="toast" class="fixed bottom-5 right-5 bg-red-900 text-white p-4 border border-red-500 opacity-0 transform translate-y-4 pointer-events-none z-50">
+        <span id="toastMsg">Error</span>
+    </div>
+
+    <script>
+        // --- 1. DATA STRUCTURE: BINARY TREE NODE ---
+        class TreeNode {
+            constructor(name) {
+                this.name = name;
+                this.left = null;
+                this.right = null;
+            }
+        }
+
+        // --- 2. BINARY TREE IMPLEMENTATION ---
+        class BinaryTree {
+            constructor() {
+                this.root = new TreeNode("root"); // Default root folder
+            }
+
+            // Find a node by name using Breadth-First Search
+            findNode(node, targetName) {
+                if (!node) return null;
+                
+                let queue = [node];
+                while (queue.length > 0) {
+                    let current = queue.shift();
+                    if (current.name === targetName) return current;
+                    
+                    if (current.left) queue.push(current.left);
+                    if (current.right) queue.push(current.right);
+                }
+                return null;
+            }
+
+            // Insert a new directory
+            insert(parentName, childName, position) {
+                const parent = this.findNode(this.root, parentName);
+                
+                if (!parent) {
+                    showError(`Directory '${parentName}' not found.`);
+                    return false;
+                }
+
+                if (position === 'left') {
+                    if (parent.left) {
+                        showError(`Left branch of '${parentName}' is already occupied by '${parent.left.name}'.`);
+                        return false;
+                    }
+                    parent.left = new TreeNode(childName);
+                } else {
+                    if (parent.right) {
+                        showError(`Right branch of '${parentName}' is already occupied by '${parent.right.name}'.`);
+                        return false;
+                    }
+                    parent.right = new TreeNode(childName);
+                }
+                return true;
+            }
+
+            // --- 3. TRAVERSAL ALGORITHMS ---
+            
+            // Pre-Order: Root, Left, Right
+            preOrder(node, result = []) {
+                if (node) {
+                    result.push(node.name);
+                    this.preOrder(node.left, result);
+                    this.preOrder(node.right, result);
+                }
+                return result;
+            }
+
+            // In-Order: Left, Root, Right
+            inOrder(node, result = []) {
+                if (node) {
+                    this.inOrder(node.left, result);
+                    result.push(node.name);
+                    this.inOrder(node.right, result);
+                }
+                return result;
+            }
+
+            // Post-Order: Left, Right, Root
+            postOrder(node, result = []) {
+                if (node) {
+                    this.postOrder(node.left, result);
+                    this.postOrder(node.right, result);
+                    result.push(node.name);
+                }
+                return result;
+            }
+        }
+
+        // --- 4. APP STATE & INITIALIZATION ---
+        const fileSystem = new BinaryTree();
+        
+        // Populate with some default dummy data to show the tree structure
+        fileSystem.insert("root", "bin", "left");
+        fileSystem.insert("root", "usr", "right");
+        fileSystem.insert("bin", "bash", "left");
+        fileSystem.insert("usr", "local", "left");
+        fileSystem.insert("usr", "share", "right");
+
+        // --- 5. DOM INTERACTION & RENDER LOGIC ---
+        
+        function renderTree(node, isRoot = true, prefix = "") {
+            if (!node) return "";
+            
+            let html = isRoot ? `<ul class="list-none">` : `<ul class="tree-ul">`;
+            
+            let tag = isRoot ? `<span class="node-tag">ROOT</span>` : `<span class="node-tag">${prefix}</span>`;
+            html += `<li class="tree-li">${tag} /${node.name}`;
+            
+            // Recursively render children
+            if (node.left || node.right) {
+                if (node.left) html += renderTree(node.left, false, "L");
+                if (node.right) html += renderTree(node.right, false, "R");
+            }
+            
+            html += `</li></ul>`;
+            return html;
+        }
+
+        function updateDisplay() {
+            document.getElementById('treeDisplay').innerHTML = renderTree(fileSystem.root);
+        }
+
+        function handleAddNode() {
+            const parent = document.getElementById('parentName').value.trim();
+            const child = document.getElementById('childName').value.trim();
+            const pos = document.getElementById('position').value;
+
+            if (!parent || !child) {
+                showError("Both Parent and Child names are required.");
+                return;
+            }
+
+            if (fileSystem.insert(parent, child, pos)) {
+                // Success
+                document.getElementById('childName').value = "";
+                updateDisplay();
+                document.getElementById('traversalOutput').innerText = `Successfully attached /${child} to /${parent}`;
+            }
+        }
+
+        function runTraversal(type) {
+            let result = [];
+            let prefix = "";
+            
+            if (type === 'pre') {
+                result = fileSystem.preOrder(fileSystem.root);
+                prefix = "$ ls_pre_order : ";
+            } else if (type === 'in') {
+                result = fileSystem.inOrder(fileSystem.root);
+                prefix = "$ ls_in_order : ";
+            } else if (type === 'post') {
+                result = fileSystem.postOrder(fileSystem.root);
+                prefix = "$ ls_post_order : ";
+            }
+
+            const outputDiv = document.getElementById('traversalOutput');
+            outputDiv.innerHTML = `<span class="text-green-500">${prefix}</span>\n[ ${result.map(name => `"/${name}"`).join(", ")} ]`;
+        }
+
+        function showError(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+            }, 3000);
+        }
+
+        // Initial render
+        updateDisplay();
+    </script>
+</body>
+</html>
